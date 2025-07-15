@@ -98,7 +98,7 @@ Access the app at: [http://localhost:8000](http://localhost:8000)
 
 Use JWT tokens to access protected routes.
 
-- Get token via: `POST /api/user/access_token`
+- Get token via: `POST /api/base/access_token`
 - Pass token in header:
   ```
   token: <your-token>
@@ -112,9 +112,9 @@ Use JWT tokens to access protected routes.
 
 | Method | Endpoint                      | Description                          |
 |--------|-------------------------------|--------------------------------------|
-| POST   | `/api/user/access_token`      | Obtain JWT token (Login)            |
-| GET    | `/api/user/userinfo`          | Get current user info (requires auth) |
-| POST   | `/api/user/update_password`   | Change current user password         |
+| POST   | `/api/base/access_token`      | Obtain JWT token (Login)            |
+| GET    | `/api/base/userinfo`          | Get current user info (requires auth) |
+| POST   | `/api/base/update_password`   | Change current user password         |
 | GET    | `/api/user/list`              | List users with pagination/filtering |
 | POST   | `/api/user/create`            | Create a new user (admin)            |
 | DELETE | `/api/user/delete?user_id=1`  | Delete a user by ID (admin)          |
@@ -126,7 +126,7 @@ Use JWT tokens to access protected routes.
 
 | Method | Endpoint             | Description                        |
 |--------|----------------------|------------------------------------|
-| GET    | `/api/todo/`         | List todos for current user        |
+| GET    | `/api/todo/list`     | List todos for current user        |
 | POST   | `/api/todo/`         | Create a new todo task             |
 | GET    | `/api/todo/{id}`     | Retrieve details of a specific task |
 | PUT    | `/api/todo/{id}`     | Update a task                      |

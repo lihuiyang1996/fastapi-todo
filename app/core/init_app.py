@@ -4,8 +4,10 @@ from aerich import Command
 from fastapi import FastAPI
 from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
+from tortoise.expressions import Q
 
 from app.api import api_router
+from app.controllers.api import api_controller
 from app.controllers.user import UserCreate, user_controller
 from app.core.exceptions import (
     DoesNotExist,
@@ -20,7 +22,11 @@ from app.core.exceptions import (
     ResponseValidationHandle,
 )
 from app.log import logger
+from app.models.admin import Api, Role
 from app.settings.config import get_config
+
+
+from .middlewares import BackGroundTaskMiddleware, HttpAuditLogMiddleware
 
 config = get_config()
 
@@ -33,16 +39,16 @@ def make_middlewares():
             allow_methods=config.CORS_ALLOW_METHODS,
             allow_headers=config.CORS_ALLOW_HEADERS,
         ),
-        # Middleware(BackGroundTaskMiddleware),
-        # Middleware(
-        #     HttpAuditLogMiddleware,
-        #     methods=["GET", "POST", "PUT", "DELETE"],
-        #     exclude_paths=[
-        #         "/api/v1/base/access_token",
-        #         "/docs",
-        #         "/openapi.json",
-        #     ],
-        # ),
+        Middleware(BackGroundTaskMiddleware),
+        Middleware(
+            HttpAuditLogMiddleware,
+            methods=["GET", "POST", "PUT", "DELETE"],
+            exclude_paths=[
+                "/api/v1/base/access_token",
+                "/docs",
+                "/openapi.json",
+            ],
+        ),
     ]
     return middleware
 
@@ -76,6 +82,7 @@ async def init_db():
 
     await command.upgrade(run_in_transaction=True)
 
+
 async def init_superuser():
     user = await user_controller.model.exists()
     if not user:
@@ -90,6 +97,35 @@ async def init_superuser():
         )
 
 
+async def init_apis():
+    apis = await api_controller.model.exists()
+    if not apis:
+        await api_controller.refresh_api()
+
+
+async def init_roles():
+    roles = await Role.exists()
+    if not roles:
+        admin_role = await Role.create(
+            name="管理员",
+            desc="管理员角色",
+        )
+        user_role = await Role.create(
+            name="普通用户",
+            desc="普通用户角色",
+        )
+
+        # 分配所有API给管理员角色
+        all_apis = await Api.all()
+        await admin_role.apis.add(*all_apis)
+
+        # 为普通用户分配基本API
+        basic_apis = await Api.filter(Q(method__in=["GET"]) | Q(tags="基础模块"))
+        await user_role.apis.add(*basic_apis)
+
+
 async def init_data():
     await init_db()
     await init_superuser()
+    await init_apis()
+    await init_roles()
