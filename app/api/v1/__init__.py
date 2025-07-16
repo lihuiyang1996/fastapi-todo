@@ -5,6 +5,7 @@ from .base import base_router
 from .roles import roles_router
 from .apis import apis_router
 from .auditlog import auditlog_router
+from .todo import todo_router
 
 from app.core.dependency import DependPermission
 
@@ -15,3 +16,4 @@ v1_router.include_router(users_router, prefix="/user", dependencies=[DependPermi
 v1_router.include_router(roles_router, prefix="/role", dependencies=[DependPermission])
 v1_router.include_router(apis_router, prefix="/api", dependencies=[DependPermission])
 v1_router.include_router(auditlog_router, prefix="/auditlog", dependencies=[DependPermission])
+v1_router.include_router(todo_router, prefix="/todo", dependencies=[DependPermission])

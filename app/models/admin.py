@@ -2,6 +2,10 @@ from tortoise import fields
 from .base import BaseModel, TimestampMixin
 from .enums import MethodType
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .todo import Todo  # 仅类型提示用，不会引发运行时循环导入
 
 class User(BaseModel, TimestampMixin):
     username = fields.CharField(max_length=20, unique=True, description="用户名称", index=True)
@@ -12,6 +16,8 @@ class User(BaseModel, TimestampMixin):
     is_active = fields.BooleanField(default=True, description="是否激活", index=True)
     is_superuser = fields.BooleanField(default=False, description="是否为超级管理员", index=True)
     last_login = fields.DatetimeField(null=True, description="最后登录时间", index=True)
+
+    todos: fields.ReverseRelation["Todo"]
 
     class Meta:
         table = "user"

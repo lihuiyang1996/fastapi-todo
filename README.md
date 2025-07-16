@@ -1,7 +1,8 @@
 # 📝 FastAPI Todo
 
 A full-featured **Todo API application** built with **FastAPI**, **Tortoise ORM**, and **JWT authentication**.  
-It supports user authentication, multi-user task management, pagination, Docker deployment, and more.  
+Now enhanced with **RBAC (Role-Based Access Control)** for fine-grained API access control.  
+It supports user authentication, role-based permission control, multi-user task management, pagination, Docker deployment, and more.  
 Perfect for learning, prototyping, or scaling into a production-ready backend.
 
 ---
@@ -9,8 +10,10 @@ Perfect for learning, prototyping, or scaling into a production-ready backend.
 ## 🚀 Features
 
 - ✅ JWT-based user authentication
+- ✅ Role-based access control (RBAC)
 - ✅ Full CRUD for tasks (todos)
 - ✅ Multi-user data isolation
+- ✅ Fine-grained API permission control
 - ✅ Pagination and filters
 - ✅ Secure endpoints with dependency injection
 - ✅ Async ORM with Tortoise
