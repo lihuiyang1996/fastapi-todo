@@ -3,7 +3,7 @@ from typing import Optional
 import jwt
 from fastapi import Depends, Header, HTTPException, Request
 
-from app.core.ctx import CTX_USER_ID
+from app.core.ctx import CTX_USER
 from app.models import Role, User
 from app.settings.config import get_config
 
@@ -23,7 +23,7 @@ class AuthControl:
             user = await User.filter(id=user_id).first()
             if not user:
                 raise HTTPException(status_code=401, detail="Authentication failed")
-            CTX_USER_ID.set(int(user_id))
+            CTX_USER.set(user)
             return user
         except jwt.DecodeError:
             raise HTTPException(status_code=401, detail="无效的Token")

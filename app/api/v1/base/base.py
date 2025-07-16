@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter
 
 from app.controllers.user import user_controller
-from app.core.ctx import CTX_USER_ID
+from app.core.ctx import CTX_USER
 from app.core.dependency import DependAuth
 from app.models.admin import User
 from app.schemas.base import Fail, Success
@@ -40,17 +40,15 @@ async def login_access_token(credentials: CredentialsSchema):
 
 @router.get("/userinfo", summary="查看用户信息", dependencies=[DependAuth])
 async def get_userinfo():
-    user_id = CTX_USER_ID.get()
-    user_obj = await user_controller.get(id=user_id)
-    data = await user_obj.to_dict(exclude_fields=["password"])
+    user = CTX_USER.get()
+    data = await user.to_dict(exclude_fields=["password"])
     data["avatar"] = "https://avatars.githubusercontent.com/u/54677442?v=4"
     return Success(data=data)
 
 
 @router.post("/update_password", summary="修改密码", dependencies=[DependAuth])
 async def update_user_password(req_in: UpdatePassword):
-    user_id = CTX_USER_ID.get()
-    user = await user_controller.get(user_id)
+    user = CTX_USER.get()
     verified = verify_password(req_in.old_password, user.password)
     if not verified:
         return Fail(msg="旧密码验证错误！")
