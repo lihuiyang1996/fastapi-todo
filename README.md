@@ -1,174 +1,149 @@
-# 📝 FastAPI Todo
+# 📝 FastAPI TODO App
 
-A full-featured **Todo API application** built with **FastAPI**, **Tortoise ORM**, and **JWT authentication**.  
-Now enhanced with **RBAC (Role-Based Access Control)** for fine-grained API access control.  
-It supports user authentication, role-based permission control, multi-user task management, pagination, Docker deployment, and more.  
-Perfect for learning, prototyping, or scaling into a production-ready backend.
+A modern asynchronous TODO application built with FastAPI, featuring PostgreSQL, Tortoise ORM, JWT authentication, and Docker Compose support. The project adopts a modular API architecture and is suitable for production deployment or full-stack backend learning.
 
----
+## 🚀 Tech Stack
 
-## 🚀 Features
+- **FastAPI** - High-performance, easy-to-write async web framework  
+- **Tortoise ORM** - Asynchronous ORM similar to Django ORM  
+- **PostgreSQL** - Stable and powerful relational database  
+- **Docker & Docker Compose** - Containerized development and deployment  
+- **JWT** - Token-based authentication system  
+- **Uvicorn** - High-performance ASGI server  
 
-- ✅ JWT-based user authentication
-- ✅ Role-based access control (RBAC)
-- ✅ Full CRUD for tasks (todos)
-- ✅ Multi-user data isolation
-- ✅ Fine-grained API permission control
-- ✅ Pagination and filters
-- ✅ Secure endpoints with dependency injection
-- ✅ Async ORM with Tortoise
-- ✅ Docker + Docker Compose support
-- ✅ Auto-generated interactive API docs (Swagger & ReDoc)
-
----
-
-## 📁 Project Structure
-
-```
-.
-├── app/
-│   ├── api/             # API routes
-│   ├── controllers/     # Business logic / repositories
-│   ├── schemas/         # Pydantic models
-│   ├── models/          # Tortoise ORM models
-│   ├── core/            # Auth, settings, dependencies
-│   └── utils/           # Utility functions
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-└── README.md
-```
-
----
-
-## ⚙️ Quick Start
+## 📦 Quick Start (Docker Recommended)
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/lihuiyang1996/fastapi-todo.git
-cd fastapi-todo
+git clone https://github.com/your-username/fastapi-todo-main.git
+cd fastapi-todo-main
 ```
 
----
+### 2. Configure environment variables
 
-### 2. Set environment variables
-
-Create and edit a `.env` file or set the following variables:
+The project includes a pre-defined `.env` file. You can modify it if needed:
 
 ```env
-DATABASE_URL=sqlite://db.sqlite3
-JWT_SECRET_KEY=your-secret-key
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES=60
+# JWT settings
+SECRET_KEY=3488a63e1765035d386f05409663f55c83bfae3b3c61a932744b20ad14244dcf
+JWT_ALGORITHM=HS256
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES=10080  # 7 days
+
+# Debug mode
+DEBUG=true
+
+# PostgreSQL settings
+DB_HOST=db
+DB_PORT=5432
+DB_USER=fastapi
+DB_PASSWORD=secret123
+DB_NAME=fastapidb
 ```
 
----
+### 3. Start the service
 
-### 3. Run locally
-
-Create virtual environment and install dependencies:
-
-```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-Run the app:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-Visit API docs:
-
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-
----
-
-### 4. Run with Docker
+Ensure you have Docker and Docker Compose installed:
 
 ```bash
 docker-compose up --build
 ```
 
-Access the app at: [http://localhost:8000](http://localhost:8000)
+App will be available at: `http://localhost:9999`  
+API documentation available at:  
+- Swagger UI: `http://localhost:9999/docs`  
+- ReDoc: `http://localhost:9999/redoc`
 
----
+## 📂 Project Structure
 
-## 🔐 Authentication
+```
+fastapi-todo-main/
+├── app/
+│   ├── api/                  # API routes
+│   │   └── v1/
+│   │       ├── apis/         # API management
+│   │       ├── todo/         # TODO operations
+│   │       ├── roles/        # Role management
+│   │       └── auditlog/     # Audit logs
+│   ├── controllers/          # Business logic
+│   ├── models/               # ORM models
+│   └── schemas/              # Request/response models
+├── run.py                    # Entry point
+├── docker-compose.yml        # Docker Compose file
+├── Dockerfile                # Build configuration
+├── .env                      # Environment variables
+├── requirements.txt          # Python dependencies
+└── README.md                 # Project documentation
+```
 
-Use JWT tokens to access protected routes.
+## 🔐 API Overview
 
-- Get token via: `POST /api/base/access_token`
-- Pass token in header:
-  ```
-  token: <your-token>
-  ```
+The project auto-generates full API documentation via `/docs`. Key endpoints include:
 
----
+### ✅ TODO Management
 
-## ✅ API Endpoints (Examples)
+- `GET /todo/list` - Get list of TODO items  
+- `POST /todo/create` - Create a new TODO  
+- `POST /todo/update` - Update a TODO item  
+- `DELETE /todo/delete` - Delete a TODO item  
 
-### Auth & User
+### ⚙️ API Management
 
-| Method | Endpoint                      | Description                          |
-|--------|-------------------------------|--------------------------------------|
-| POST   | `/api/base/access_token`      | Obtain JWT token (Login)            |
-| GET    | `/api/base/userinfo`          | Get current user info (requires auth) |
-| POST   | `/api/base/update_password`   | Change current user password         |
-| GET    | `/api/user/list`              | List users with pagination/filtering |
-| POST   | `/api/user/create`            | Create a new user (admin)            |
-| DELETE | `/api/user/delete?user_id=1`  | Delete a user by ID (admin)          |
-| POST   | `/api/user/reset_password`    | Reset user password (admin)          |
+- `GET /apis/list` - List registered APIs (with pagination and search)  
+- `GET /apis/get?id=1` - Get details of an API  
+- `POST /apis/create` - Create new API  
+- `POST /apis/update` - Update API  
+- `DELETE /apis/delete?api_id=1` - Delete API  
+- `POST /apis/refresh` - Refresh and register all routes  
 
----
+> All responses are standardized as `Success` or `SuccessExtra` objects for frontend consistency.
 
-### Todos
+## 🗄️ Database & Migrations (Optional)
 
-| Method | Endpoint             | Description                        |
-|--------|----------------------|------------------------------------|
-| GET    | `/api/todo/list`     | List todos for current user        |
-| POST   | `/api/todo/`         | Create a new todo task             |
-| GET    | `/api/todo/{id}`     | Retrieve details of a specific task |
-| PUT    | `/api/todo/{id}`     | Update a task                      |
-| DELETE | `/api/todo/{id}`     | Delete a task                      |
+Tortoise ORM is used for async DB operations. It's recommended to use [aerich](https://tortoise-orm.readthedocs.io/en/latest/migration.html) for migrations.
 
-> All todo endpoints require authentication.
+Sample commands:
 
----
+```bash
+# Initial setup
+aerich init -t app.models.TORTOISE_ORM
 
-## 🧪 Development Tips
+# Create a migration
+aerich migrate
 
-- Use `black`, `isort`, or `ruff` for formatting
-- Write unit tests for controllers & services
-- Use Git branches and semantic commit messages
-- Keep `requirements.txt` updated (`pip freeze > requirements.txt`)
+# Apply migration
+aerich upgrade
+```
 
----
+Ensure your `.env` file is configured and PostgreSQL is running.
 
-## 📈 Future Improvements
+## 🧪 Run Locally (Non-Docker)
 
-- Add task categories or labels
-- Add file uploads or image support
-- Add email/password reset workflow
-- Add background tasks with Celery or APScheduler
-- Add frontend integration (e.g. React or Vue)
+For manual local development:
 
----
+```bash
+# Create and activate a virtual environment
+python -m venv venv
+source venv/bin/activate
 
-## 📚 References
+# Install dependencies
+pip install -r requirements.txt
 
-- [FastAPI Docs](https://fastapi.tiangolo.com/)
-- [Tortoise ORM](https://tortoise-orm.readthedocs.io/)
-- [Pydantic](https://docs.pydantic.dev/)
-- [JWT with FastAPI](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/)
+# Run the app
+uvicorn app:app --host 0.0.0.0 --port 9999 --reload
+```
 
----
+Make sure PostgreSQL is installed and your `.env` matches local DB credentials.
 
-## 🙌 Contributing
+## 🐳 Docker Compose Details
 
-Feel free to open issues or submit pull requests to improve the project.
+The `docker-compose.yml` launches:
 
----
+- `app`: FastAPI service with auto-reload  
+- `db`: PostgreSQL container with persistent volume (`pgdata`)  
+
+It uses the `.env` file for automatic configuration.
+
+## 📝 License
+
+This project is licensed under the MIT License. See LICENSE file for details.
