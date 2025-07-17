@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    container_name: fastapi_app
+    ports:
+      - "9999:9999"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+  db:
+    image: postgres:11.5-alpine
+    container_name: pg-fastapi
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
