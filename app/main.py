@@ -1,21 +1,20 @@
 from fastapi import FastAPI
-from tortoise import Tortoise
 from app.settings.config import get_config
 from contextlib import asynccontextmanager
-from app.core.init_app import (
-    init_data,
+from app.core.init.app import (
     make_middlewares,
     register_exceptions,
     register_routers,
 )
+from app.core.init.db import connect_db, close_db
 
 config = get_config()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_data()
+    await connect_db()
     yield
-    await Tortoise.close_connections()
+    await close_db()
 
 
 def create_app() -> FastAPI:
